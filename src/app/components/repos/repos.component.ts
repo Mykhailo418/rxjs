@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {CustomObservableService} from '../../services/custom-observable.service';
+import {Repo} from '../../models/repo';
 
 @Component({
   selector: 'app-repos',
@@ -7,14 +8,16 @@ import {CustomObservableService} from '../../services/custom-observable.service'
   styleUrls: ['./repos.component.less']
 })
 export class ReposComponent implements OnInit {
+  repos: Repo[];
 
   constructor(private reposService: CustomObservableService) { }
 
   loadRepos(){
     this.reposService.getRepos()
       .subscribe(
-        (repos) => {
-          console.log(repos);
+        (repos: Repo[]) => {
+          this.repos = repos;
+          console.log(this.repos);
         },
         err => console.log('ERROR', err),
         () => console.log('complete repos')
