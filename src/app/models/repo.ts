@@ -15,5 +15,6 @@ export interface Repo {
   "archive_url": string,
   "downloads_url": string,
   "issues_url": string,
-  "deployments_url": string
+  "deployments_url": string,
+  "fork": boolean
 }

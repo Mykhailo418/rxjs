@@ -1,1 +1,15 @@
 <h3>Repos</h3>
+<div class="row">
+  <div class="col-sm">
+    <h4>Public Repos</h4>
+      <ul>
+        <li *ngFor="let repo of publicRepos$ | async">{{repo.name}}</li>
+      </ul>
+  </div>
+  <div class="col-sm">
+    <h4>Private Repos</h4>
+      <ul>
+        <li *ngFor="let repo of privateRepos$ | async">{{repo.name}}</li>
+      </ul>
+  </div>
+</div>
