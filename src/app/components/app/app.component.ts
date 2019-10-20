@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { timer, interval, fromEvent } from 'rxjs';
+import { timer, interval, fromEvent, of } from 'rxjs';
+import { concat } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -35,5 +36,16 @@ export class AppComponent implements OnInit {
       }
     );
     setTimeout(() => timerSubscription.unsubscribe(), 9000);
+
+    this.concatOperator();
 	}
+
+  concatOperator(){
+    const souce1$ = of(1, 2);
+    const souce2$ = of(3, 4);
+    const souce3$ = of(5, 6);
+
+    souce1$.pipe(concat(souce2$, souce3$))
+      .subscribe((val: number) => console.log('concatOperator: ', val));
+  }
 }
