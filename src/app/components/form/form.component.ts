@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 import { from } from 'rxjs';
-import { filter, concatMap } from 'rxjs/operators';
+import { filter, concatMap, mergeMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-form',
@@ -19,7 +19,8 @@ export class FormComponent implements OnInit {
     });
     this.componentForm.valueChanges.pipe(
       filter(() => this.componentForm.valid),
-      concatMap((changes: any) => this.saveForm(changes))
+      //concatMap((changes: any) => this.saveForm(changes)), // one by one
+      mergeMap((changes: any) => this.saveForm(changes)) // in parallel, at the same time
     )
     .subscribe();
   }
