@@ -13,11 +13,18 @@ export class CustomObservableService {
   getRepos(){
     // Custom Observable
     return Observable.create(observer => {
-      fetch(this.githubReposURL)
+      const controller = new AbortController(); // native JS class
+      const signal = controller.signal;
+
+      fetch(this.githubReposURL, {signal})
         .then(res => res.json())
         .then((repos: Repo[]) => observer.next(repos))
         .catch(err => observer.error(err))
         .finally(() => observer.complete());
+
+      return function cancellationFunction(){
+        controller.abort();
+      }
     });
   }
 }

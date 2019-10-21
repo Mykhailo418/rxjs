@@ -26,6 +26,14 @@ export class ReposComponent implements OnInit {
     this.publicRepos$ = repos$.pipe(
       map((repos: Repo[]) => repos.filter(repos => !repos.private))
     );
+
+    /*
+    * Cancellation request
+    const subscription = repos$.subscribe();
+    subscription.unsubscribe()
+    */
+
+    //setTimeout(() => subscription.unsubscribe(), 0);
       /*this.reposService.getRepos().subscribe(
         (repos: Repo[]) => {
           this.repos = repos;
