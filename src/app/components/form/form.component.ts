@@ -1,14 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
-import { from } from 'rxjs';
-import { filter, concatMap, mergeMap } from 'rxjs/operators';
+import { from, fromEvent } from 'rxjs';
+import { filter, concatMap, mergeMap, exhaustMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-form',
   templateUrl: './form.component.html',
   styleUrls: ['./form.component.less']
 })
-export class FormComponent implements OnInit {
+export class FormComponent implements OnInit, AfterViewInit {
+  @ViewChild('btnSubmit') btnSubmit: ElementRef;
   componentForm: FormGroup;
   constructor() { }
 
@@ -23,6 +24,15 @@ export class FormComponent implements OnInit {
       mergeMap((changes: any) => this.saveForm(changes)) // in parallel, at the same time
     )
     .subscribe();
+  }
+
+  ngAfterViewInit() {
+    fromEvent(this.btnSubmit.nativeElement, 'click')
+      .pipe(
+        // like mergeMap but it will merge only observables if previous were completed
+        exhaustMap(() => this.saveForm(this.componentForm.value))
+      )
+      .subscribe();
   }
 
   saveForm(changes: any){
