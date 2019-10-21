@@ -1,8 +1,8 @@
 import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
-import { from, fromEvent } from 'rxjs';
+import { from, fromEvent, of } from 'rxjs';
 import { filter, concatMap, mergeMap, exhaustMap, debounceTime,
-  distinctUntilChanged, switchMap } from 'rxjs/operators';
+  distinctUntilChanged, switchMap, catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'app-form',
@@ -26,6 +26,7 @@ export class FormComponent implements OnInit, AfterViewInit {
       //concatMap((changes: any) => this.saveForm(changes)), // one by one
       //mergeMap((changes: any) => this.saveForm(changes)), // in parallel, at the same time
       switchMap((changes: any) => this.saveForm(changes)), // emitting values only from the most recently projected Observable
+      catchError((err: Error) => of('Handling Error Observable'))
     )
     .subscribe(console.log);
   }
