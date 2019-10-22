@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {CustomObservableService} from '../../services/custom-observable.service';
 import {customOperator} from '../../operators/customOperator'
 import { timer, interval, fromEvent, of, forkJoin } from 'rxjs';
-import { concat, map, merge, retryWhen, delayWhen, tap, delay, first, take } from 'rxjs/operators';
+import { concat, map, merge, retryWhen, delayWhen, tap, delay, first, take, withLatestFrom } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -46,6 +46,7 @@ export class AppComponent implements OnInit {
     this.retryRequest();
     this.joinObservables();
     this.getLimitValues();
+    this.withLatestFromOperator();
 	}
 
   concatOperator(){
@@ -98,5 +99,28 @@ export class AppComponent implements OnInit {
       take(4) // take first n-th values and complete observable
     )
     .subscribe((val: number) => console.log('getLimitValues: ', val));
+  }
+
+  withLatestFromOperator(){
+    //emit every 5s
+    const source = interval(5000);
+    //emit every 1s
+    const secondSource = interval(1000);
+    //withLatestFrom slower than source
+    const subscription = secondSource.pipe(
+      //both sources must emit at least 1 value (5s) before emitting
+      withLatestFrom(source),
+      map(([first, second]) => {
+        return `Source (1s): ${first} Latest From (5s): ${second}`;
+      })
+    )
+    .subscribe(val => console.log(val));
+    /*
+      "Source (1s): 4 Latest From (5s): 0"
+      "Source (1s): 5 Latest From (5s): 0"
+      "Source (1s): 6 Latest From (5s): 0"
+      ...
+    */
+    setTimeout(() => subscription.unsubscribe(),20000);
   }
 }
