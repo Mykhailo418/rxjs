@@ -7,6 +7,7 @@ import {Repo} from '../models/repo';
 })
 export class CustomObservableService {
   private githubReposURL: string = 'https://api.github.com/repositories';
+  private errorURL: string = 'https://api.gitthub.com';
 
   constructor() { }
 
@@ -25,6 +26,16 @@ export class CustomObservableService {
       return function cancellationFunction(){
         controller.abort();
       }
+    });
+  }
+
+  getErrorRequest(){
+    return Observable.create(observer => {
+      fetch(this.errorURL)
+        .then(res => (res.ok) ? res.json() : observer.error(res.status))
+        .then((data:any) => observer.next(data))
+        .catch(err => observer.error(err))
+        .finally(() => observer.complete());
     });
   }
 }

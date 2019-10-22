@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import {CustomObservableService} from '../../services/custom-observable.service';
 import { timer, interval, fromEvent, of } from 'rxjs';
-import { concat, map, merge } from 'rxjs/operators';
+import { concat, map, merge, retryWhen, delayWhen, tap, delay } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -11,6 +12,8 @@ export class AppComponent implements OnInit {
 	count: number;
 	mouseX: number = 0;
 	mouseY: number = 0;
+
+  constructor(private customObservableService: CustomObservableService){}
 
 	ngOnInit(){
 		const interval$ = interval(1000); // like a setInterval()
@@ -39,6 +42,7 @@ export class AppComponent implements OnInit {
 
     this.concatOperator();
     this.mergeOperator();
+    this.retryRequest();
 	}
 
   concatOperator(){
@@ -60,5 +64,18 @@ export class AppComponent implements OnInit {
     )
     .subscribe((val: number) => console.log('mergeOperator: ', val));
     setTimeout(() => mergeSubscribtion.unsubscribe(), 5000);
+  }
+
+  retryRequest(){
+    const subscription = this.customObservableService.getErrorRequest().pipe(
+      tap(console.log), // if there is anything before 'retryWhen', it does not work for some reason
+      retryWhen(errors => errors.pipe(
+        tap(val => console.log(`Retry error ${val}`)),
+        //delay(2000)
+        delayWhen(() => timer(2000)) //in examples this way is prefereable then just delay
+      ))
+    )
+    .subscribe();
+    setTimeout(() => subscription.unsubscribe(), 6000);
   }
 }
