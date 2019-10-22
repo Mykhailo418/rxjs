@@ -3,6 +3,7 @@ import { FormGroup, FormControl } from '@angular/forms';
 import { from, fromEvent, of } from 'rxjs';
 import { filter, concatMap, mergeMap, exhaustMap, debounceTime,
   distinctUntilChanged, switchMap, catchError, throttleTime } from 'rxjs/operators';
+import {customOperator} from '../../operators/customOperator'
 
 @Component({
   selector: 'app-form',
@@ -24,6 +25,7 @@ export class FormComponent implements OnInit, AfterViewInit {
       //throttleTime(500), // delay, it runs observable after 500ms does not depend is user typing (you may not get last value!!!)
       distinctUntilChanged(), // Only emit when the current value is different than the last
       filter(() => this.componentForm.valid),
+      customOperator('DEBUGGING OPERATOR'),
       //concatMap((changes: any) => this.saveForm(changes)), // one by one
       //mergeMap((changes: any) => this.saveForm(changes)), // in parallel, at the same time
       switchMap((changes: any) => this.saveForm(changes)), // emitting values only from the most recently projected Observable
