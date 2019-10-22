@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angula
 import { FormGroup, FormControl } from '@angular/forms';
 import { from, fromEvent, of } from 'rxjs';
 import { filter, concatMap, mergeMap, exhaustMap, debounceTime,
-  distinctUntilChanged, switchMap, catchError } from 'rxjs/operators';
+  distinctUntilChanged, switchMap, catchError, throttleTime } from 'rxjs/operators';
 
 @Component({
   selector: 'app-form',
@@ -20,7 +20,8 @@ export class FormComponent implements OnInit, AfterViewInit {
       'gender': new FormControl('gender')
     });
     this.componentForm.valueChanges.pipe(
-      debounceTime(500), // delay
+      debounceTime(500), // delay after user finish typing, it start count again after each time user press key button
+      //throttleTime(500), // delay, it runs observable after 500ms does not depend is user typing (you may not get last value!!!)
       distinctUntilChanged(), // Only emit when the current value is different than the last
       filter(() => this.componentForm.valid),
       //concatMap((changes: any) => this.saveForm(changes)), // one by one
