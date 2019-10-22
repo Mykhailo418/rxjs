@@ -17,7 +17,7 @@ export class CustomObservableService {
       const signal = controller.signal;
 
       fetch(this.githubReposURL, {signal})
-        .then(res => res.json())
+        .then(res => (res.ok) ? res.json() : observer.error(res.status))
         .then((repos: Repo[]) => observer.next(repos))
         .catch(err => observer.error(err))
         .finally(() => observer.complete());

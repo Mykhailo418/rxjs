@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import {CustomObservableService} from '../../services/custom-observable.service';
 import {Repo} from '../../models/repo';
-import {Observable} from 'rxjs';
-import {map, tap, shareReplay} from 'rxjs/operators';
+import {Observable, throwError} from 'rxjs';
+import {map, tap, shareReplay, catchError, finalize} from 'rxjs/operators';
 
 @Component({
   selector: 'app-repos',
@@ -17,8 +17,10 @@ export class ReposComponent implements OnInit {
 
   loadRepos(){
     const repos$ = this.reposService.getRepos().pipe(
+      catchError((err: Error) => throwError(err)),
       tap(() => console.log('Repos was loaded!')),
-      shareReplay() // in order prevent multiple request to server, make only one request and share copy of data to other subscribers
+      shareReplay(), // in order prevent multiple request to server, make only one request and share copy of data to other subscribers
+      finalize(() => console.log('finalize repos'))
     );
     this.privateRepos$ = repos$.pipe(
       map((repos: Repo[]) => repos.filter(repos => repos.private))
