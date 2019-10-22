@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {CustomObservableService} from '../../services/custom-observable.service';
-import { timer, interval, fromEvent, of } from 'rxjs';
+import {customOperator} from '../../operators/customOperator'
+import { timer, interval, fromEvent, of, forkJoin } from 'rxjs';
 import { concat, map, merge, retryWhen, delayWhen, tap, delay } from 'rxjs/operators';
 
 @Component({
@@ -43,6 +44,7 @@ export class AppComponent implements OnInit {
     this.concatOperator();
     this.mergeOperator();
     this.retryRequest();
+    this.joinObservables();
 	}
 
   concatOperator(){
@@ -77,5 +79,15 @@ export class AppComponent implements OnInit {
     )
     .subscribe();
     setTimeout(() => subscription.unsubscribe(), 6000);
+  }
+
+  joinObservables(){
+    const userInfo$ = this.customObservableService.getUserInfo();
+    const userRepos$ = this.customObservableService.getUserRepos();
+    // run observables in parallel and combine their each LAST value in array
+    forkJoin(userInfo$, userRepos$).pipe(
+      customOperator('USER INFO: ')
+    )
+    .subscribe();
   }
 }

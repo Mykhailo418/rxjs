@@ -8,10 +8,11 @@ import {Repo} from '../models/repo';
 export class CustomObservableService {
   private githubReposURL: string = 'https://api.github.com/repositories';
   private errorURL: string = 'https://api.gitthub.com';
+  private user: string = 'mykhailo418';
 
   constructor() { }
 
-  getRepos(){
+  getRepos() : Observable<any> {
     // Custom Observable
     return Observable.create(observer => {
       const controller = new AbortController(); // native JS class
@@ -29,11 +30,23 @@ export class CustomObservableService {
     });
   }
 
-  getErrorRequest(){
+  getErrorRequest() : Observable<any> {
+    return this.fetchUrlWithObservable(this.errorURL);
+  }
+
+  getUserInfo() : Observable<any> {
+      return this.fetchUrlWithObservable(`https://api.github.com/users/${this.user}`);
+  }
+
+  getUserRepos() : Observable<any> {
+      return this.fetchUrlWithObservable(`https://api.github.com/users/${this.user}/repos`);
+  }
+
+  fetchUrlWithObservable(url: string) : Observable<any> {
     return Observable.create(observer => {
-      fetch(this.errorURL)
+      fetch(url)
         .then(res => (res.ok) ? res.json() : observer.error(res.status))
-        .then((data:any) => observer.next(data))
+        .then((data: any) => observer.next(data))
         .catch(err => observer.error(err))
         .finally(() => observer.complete());
     });
