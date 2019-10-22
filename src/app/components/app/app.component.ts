@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {CustomObservableService} from '../../services/custom-observable.service';
 import {customOperator} from '../../operators/customOperator'
 import { timer, interval, fromEvent, of, forkJoin } from 'rxjs';
-import { concat, map, merge, retryWhen, delayWhen, tap, delay } from 'rxjs/operators';
+import { concat, map, merge, retryWhen, delayWhen, tap, delay, first, take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -45,6 +45,7 @@ export class AppComponent implements OnInit {
     this.mergeOperator();
     this.retryRequest();
     this.joinObservables();
+    this.getLimitValues();
 	}
 
   concatOperator(){
@@ -84,10 +85,18 @@ export class AppComponent implements OnInit {
   joinObservables(){
     const userInfo$ = this.customObservableService.getUserInfo();
     const userRepos$ = this.customObservableService.getUserRepos();
-    // run observables in parallel and combine their each LAST value in array
+    // run observables in parallel and combine their each LAST value in array, it waits for completion
     forkJoin(userInfo$, userRepos$).pipe(
       customOperator('USER INFO: ')
     )
     .subscribe();
+  }
+
+  getLimitValues(){
+    interval(1000).pipe(
+      //first(), // take first value and complete observable
+      take(4) // take first n-th values and complete observable
+    )
+    .subscribe((val: number) => console.log('getLimitValues: ', val));
   }
 }
